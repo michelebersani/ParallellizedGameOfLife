@@ -1,0 +1,12 @@
+For the framework projects, we would like to have two implementations of the framework, providing a similar API, one implemented
+using only the C++ threads and one implemented on top of FastFlow.
+
+Cellular automata
+A cellular automaton consists of a regular grid of cells, where each cell may be in one of a finite number
+of states. The grid to be considered is toroidal 2D mesh, where the last row (column) must be considered
+adjacent to the first row (column). An initial state is determined by an assignment of a particular state for
+each cell. A new generation is created according to some fixed set of rules that determine the new state
+of each cell in terms of the current state of the cell and the states of the cells in its neighborhood. The rule
+for updating the status of cells is the same for each cell and does not change over time and is applied to
+the entire grid simultaneously. The computation of a cellular automaton consists of the computation of
+the changes in grid cell status for a given number of iterations.
