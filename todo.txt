@@ -1,0 +1,10 @@
+CMAKE
+
+1) Source build folder
+cd build
+
+2) compile:
+cmake ..
+
+3) build:
+cmake --build . 

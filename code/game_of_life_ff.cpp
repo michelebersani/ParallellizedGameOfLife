@@ -11,20 +11,21 @@ int binaryInit(){
 
 int main(int argc, char * argv[]) {
 
-    if(argc != 5) {
-        std::cout << "Usage is: " << argv[0] << " N M number_step seed" << std::endl;
+    if(argc != 6) {
+        std::cout << "Usage is: " << argv[0] << " N M number_step seed nw" << std::endl;
         return(-1);
     }
 
     int N = atoi(argv[1]);
     int M = atoi(argv[2]);
     int numSteps = atoi(argv[3]);
-    int seed = atoi(argv[4]);
-    std::srand(seed);
+    std::srand(atoi(argv[4]));
+    int numWorkers = atoi(argv[5]);
 
-    SequentialSolver sequential = SequentialSolver();
+    
+    ffSolver solver = ffSolver();
     GameOfLifeRule rule = GameOfLifeRule();
-    Board board = Board(N, M, std::ref(sequential), std::ref(rule));
+    Board board = Board(N, M, solver, rule);
     
     std::vector<std::vector<int>> firstState (N, std::vector<int> (M));
     for (auto &row: firstState){
@@ -33,7 +34,7 @@ int main(int argc, char * argv[]) {
 
     board.setInitialState(firstState);
     board.reset();
-    board.solve(numSteps, verbose,1);
-
-    return (0);
+    board.solve(numSteps, verbose, numWorkers);
+    
+    return(0);
 }

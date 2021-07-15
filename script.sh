@@ -5,7 +5,8 @@ rm exec/thread.txt exec/seq.txt
 
 #MacOS
 
-g++ -std=c++17  -g   -O3 -finline-functions -DNDEBUG -o exec/seq code/game_of_life_seq.cpp -pthread -Xpreprocessor -fopenmp -lomp
+
+g++ -std=c++17  -g   -O3 -finline-functions -DNDEBUG -o exec/seq code/board.cpp code/game_of_life_seq.cpp -pthread -Xpreprocessor -fopenmp -lomp
 #g++ -std=c++17  -g   -O3 -finline-functions -DNDEBUG -o exec/thread code/game_of_life_thread.cpp -pthread -Xpreprocessor -fopenmp -lomp
 
 #Others
