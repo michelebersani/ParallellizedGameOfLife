@@ -1,7 +1,7 @@
-#include "board.h"
 #include <algorithm>
 #include <cstdlib>
 #include <iostream>
+#include "solvers.h"
 
 bool verbose = false;
 
@@ -22,11 +22,10 @@ int main(int argc, char * argv[]) {
     std::srand(atoi(argv[4]));
     int numWorkers = atoi(argv[5]);
 
-    
-    ffSolver solver = ffSolver();
     GameOfLifeRule rule = GameOfLifeRule();
-    Board board = Board(N, M, solver, rule);
-    
+    Board board = Board(N, M, rule);
+    ffSolver solver = ffSolver(&board);
+
     std::vector<std::vector<int>> firstState (N, std::vector<int> (M));
     for (auto &row: firstState){
         std::generate(row.begin(), row.end(), binaryInit);
@@ -34,7 +33,7 @@ int main(int argc, char * argv[]) {
 
     board.setInitialState(firstState);
     board.reset();
-    board.solve(numSteps, verbose, numWorkers);
+    solver.solve(numSteps, verbose, numWorkers);
     
     return(0);
 }

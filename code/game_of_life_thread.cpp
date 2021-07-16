@@ -1,4 +1,4 @@
-#include "board.h"
+#include "solvers.h"
 #include <algorithm>
 #include <cstdlib>
 #include <iostream>
@@ -21,11 +21,10 @@ int main(int argc, char * argv[]) {
     int numSteps = atoi(argv[3]);
     std::srand(atoi(argv[4]));
     int numWorkers = atoi(argv[5]);
-
-    
-    ThreadSolver solver = ThreadSolver();
+        
     GameOfLifeRule rule = GameOfLifeRule();
-    Board board = Board(N, M, solver, rule);
+    Board board = Board(N, M, rule);
+    ThreadSolver solver = ThreadSolver(&board);
     
     std::vector<std::vector<int>> firstState (N, std::vector<int> (M));
     for (auto &row: firstState){
@@ -34,7 +33,7 @@ int main(int argc, char * argv[]) {
 
     board.setInitialState(firstState);
     board.reset();
-    board.solve(numSteps, verbose, numWorkers);
+    solver.solve(numSteps, verbose, numWorkers);
     
     return(0);
 }
