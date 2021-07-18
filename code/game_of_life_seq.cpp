@@ -21,17 +21,18 @@ int main(int argc, char * argv[]) {
     int numSteps = atoi(argv[3]);
     int seed = atoi(argv[4]);
     std::srand(seed);
+    short int cellStates = 2;
 
     GameOfLifeRule rule = GameOfLifeRule();
-    Board board = Board(N, M, std::ref(rule));
+    Board board = Board(N, M, cellStates, std::ref(rule));
     SequentialSolver solver = SequentialSolver(&board);
     
-    std::vector<std::vector<int>> firstState (N, std::vector<int> (M));
+    std::vector<std::vector<short int>> firstState (N, std::vector<short int> (M));
     for (auto &row: firstState){
         std::generate(row.begin(), row.end(), binaryInit);
     }
 
-    board.setInitialState(firstState);
+    board.defineInitialState(firstState);
     board.reset();
     solver.solve(numSteps, verbose,1);
 

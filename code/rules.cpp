@@ -1,8 +1,8 @@
 #include "rules.h"
 
-int GameOfLifeRule::operator() (int centre, int up, int down, int left, int right, int upLeft, int upRight, int downLeft, int downRight){
+short int GameOfLifeRule::operator() (short int centre, short int up, short int down, short int left, short int right, short int upLeft, short int upRight, short int downLeft, short int downRight){
 
-    int sum = up + right + left + down + downLeft + downRight + upLeft + upRight; 
+    short int sum = up + right + left + down + downLeft + downRight + upLeft + upRight; 
     
     if(sum == 3 || (centre == 1 && sum == 2)){
         return 1;

@@ -14,16 +14,17 @@ class Board{
         friend class ffSolver;
 
         int N, M;
-        std::vector<int> presentBoard, pastBoard, initialState;
+        short int cellStates;
+        std::vector<short int> presentBoard, pastBoard, initialState;
         UpdateRule &rule;
 
         void swapBoards();
         void updateCell(int j);
 
     public:
-        Board(int N, int M, UpdateRule &rule);
+        Board(int N, int M, short int cellStates, UpdateRule &rule);
         void setUpdateRule(UpdateRule& rule);
-        void setInitialState(std::vector<std::vector<int>> &matrix);
+        void defineInitialState(std::vector<std::vector<short int>> &matrix);
         void reset();
         void printBoard();
 

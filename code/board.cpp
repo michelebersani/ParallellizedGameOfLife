@@ -1,25 +1,33 @@
 #include<iostream>
+#include <algorithm>
+#include <cstdlib>
 #include"board.h"
 
-Board::Board(int N, int M, UpdateRule &rule) : N(N), M(M), rule(rule){
-    initialState = std::vector<int> (N*M);
-    presentBoard = std::vector<int> (N*M);
-    pastBoard = std::vector<int> (N*M);
+Board::Board(int N, int M, short int cellStates, UpdateRule &rule) : N(N), M(M), cellStates(cellStates), rule(rule){
+    std::vector<short int> initialState;
+    presentBoard = std::vector<short int> (N*M);
+    pastBoard = std::vector<short int> (N*M);
 }
 
 void Board::setUpdateRule(UpdateRule& rule){
     this->rule = rule;
 }
 
-void Board::setInitialState(std::vector<std::vector<int>> &matrix){
-    initialState = std::vector<int>();
+void Board::defineInitialState(std::vector<std::vector<short int>> &matrix){
+    initialState = std::vector<short int>();
     for(auto && v : matrix){
         initialState.insert(initialState.end(), v.begin(), v.end());
     }
 }
 
 void Board::reset(){
-    presentBoard = initialState;
+    if (initialState.empty()){
+        initialState = std::vector<short int>(N*M);
+        std::generate(initialState.begin(), initialState.end(), [this](){return (std::rand())%(this->cellStates);});
+    }
+    else{
+        presentBoard = initialState;
+    }
 }
 
 void Board::swapBoards(){
@@ -30,7 +38,7 @@ void Board::updateCell(int j){
 
     int row = j/M;
     int col = j%M;
-
+    
     int upIndex = (row == 0) ? (N - 1) * M + col : (row - 1) * M + col;
     int downIndex = (row == N - 1) ? col : (row + 1) * M + col;
     int leftIndex = (col == 0) ? (row + 1) * M - 1 : row * M  + col - 1;
@@ -40,17 +48,18 @@ void Board::updateCell(int j){
     int downLeftIndex = downIndex - col + leftIndex % M;
     int downRightIndex = downIndex - col + rightIndex % M;
     
-    int centre = pastBoard[j];
-    int up = pastBoard[upIndex];
-    int down = pastBoard[downIndex];
-    int left = pastBoard[leftIndex];
-    int right = pastBoard[rightIndex];
-    int upLeft = pastBoard[upLeftIndex];
-    int upRight = pastBoard[upRightIndex];
-    int downLeft = pastBoard[downLeftIndex];
-    int downRight = pastBoard[downRightIndex]; 
+    short int centre = pastBoard[j];
+    short int up = pastBoard[upIndex];
+    short int down = pastBoard[downIndex];
+    short int left = pastBoard[leftIndex];
+    short int right = pastBoard[rightIndex];
+    short int upLeft = pastBoard[upLeftIndex];
+    short int upRight = pastBoard[upRightIndex];
+    short int downLeft = pastBoard[downLeftIndex];
+    short int downRight = pastBoard[downRightIndex]; 
     
     presentBoard[j] = rule(centre, up, down, left, right, upLeft, upRight, downLeft, downRight);
+
 }
 
 void Board::printBoard(){
@@ -67,7 +76,7 @@ void Board::printBoard(){
     
     for (int i=0; i<N; ++i){
         for (int j=0; j<M; ++j){
-            int x = presentBoard[j + M*i];
+            short int x = presentBoard[j + M*i];
             if(x == 0){
                 std::cout<<" ";
             }
