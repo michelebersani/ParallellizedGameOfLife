@@ -20,6 +20,11 @@ add_library(
     ../code/solver_thread.cpp
 )
 add_library(
+    thread_pool_solver
+    ../code/solvers.h
+    ../code/solver_threadpool.cpp
+)
+add_library(
     board
     ../code/board.h
     ../code/board.cpp
@@ -38,3 +43,6 @@ target_link_libraries(ff PRIVATE ff_solver rules board)
 
 add_executable(thread ../code/game_of_life_thread.cpp)
 target_link_libraries(thread PRIVATE thread_solver rules board)
+
+add_executable(threadpool ../code/game_of_life_threadpool.cpp)
+target_link_libraries(threadpool PRIVATE thread_pool_solver rules board)

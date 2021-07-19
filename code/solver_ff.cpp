@@ -8,10 +8,9 @@ ffSolver::ffSolver(Board *parent){
     this->parentPtr = parent;
 }
 
-void ffSolver::solve(int numSteps, bool verbose, int numWorkers){
+void ffSolver::solve(int numSteps, bool verbose, int numWorkers, int chunksize){
     utimer tp("ff_solver");
     int size = parentPtr->N * parentPtr->M;
-    int chunk = 0;
     
     ParallelFor pf(numWorkers);
 
@@ -23,7 +22,7 @@ void ffSolver::solve(int numSteps, bool verbose, int numWorkers){
         
         parentPtr->swapBoards();
 
-        pf.parallel_for(0, size, 1, chunk, [this](const int j) {
+        pf.parallel_for(0, size, 1, chunksize, [this](const int j) {
                 this->parentPtr->updateCell(j);
             }, numWorkers);
         

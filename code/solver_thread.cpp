@@ -5,7 +5,7 @@ ThreadSolver::ThreadSolver(Board *parent){
     this->parentPtr = parent;
 }
 
-void ThreadSolver::solve(int numSteps, bool verbose, int numWorkers){
+void ThreadSolver::solve(int numSteps, bool verbose, int numWorkers, int chunksize){
     utimer tp("thread_solver");
     if(verbose){
         parentPtr->printBoard();
@@ -29,7 +29,7 @@ void ThreadSolver::solve(int numSteps, bool verbose, int numWorkers){
         
         for(int i = 0; i < numWorkers; i++) {                     // split the board into peaces
             ranges[i].first = i * delta;
-            ranges[i].second   = (i != (numWorkers - 1) ? (i + 1) * delta : N * M); 
+            ranges[i].second   = i != (numWorkers - 1) ? (i + 1) * delta : N * M; 
         }
         
         for(int i = 0; i < numWorkers; i++) {                     // assign chuncks to threads

@@ -6,7 +6,7 @@
 
 class Solver {
     public:
-        virtual void solve(int numSteps, bool verbose, int numWorkers) = 0;
+        virtual void solve(int numSteps, bool verbose, int numWorkers, int chunksize) = 0;
     protected:
         Board * parentPtr;
 };
@@ -15,19 +15,27 @@ class Solver {
 class SequentialSolver : public Solver{
     public:
         SequentialSolver(Board * parent);
-        void solve(int numSteps, bool verbose, int numWorkers);
+        void solve(int numSteps, bool verbose, int numWorkers, int chunksize);
 };
 
 class ffSolver : public Solver{
     public:
         ffSolver(Board * parent);
-        void solve(int numSteps, bool verbose, int numWorkers);
+        void solve(int numSteps, bool verbose, int numWorkers, int chunksize);
 };
 
 class ThreadSolver : public Solver{
     public:
         ThreadSolver(Board * parent);
-        void solve(int numSteps, bool verbose, int numWorkers);
+        void solve(int numSteps, bool verbose, int numWorkers, int chunksize);
+};
+
+class ThreadPoolSolver : public Solver{
+    public:
+        ThreadPoolSolver(Board * parent);
+        void solve(int numSteps, bool verbose, int numWorkers, int chunksize);
+    private:
+        class FunctionPool;
 };
 
 #endif

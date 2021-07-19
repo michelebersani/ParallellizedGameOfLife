@@ -1,7 +1,7 @@
+#include "solvers.h"
 #include <algorithm>
 #include <cstdlib>
 #include <iostream>
-#include "solvers.h"
 
 bool verbose = false;
 
@@ -11,8 +11,8 @@ int binaryInit(){
 
 int main(int argc, char * argv[]) {
 
-    if(argc != 7) {
-        std::cout << "Usage is: " << argv[0] << " N M number_step seed nw dynamic_assignment" << std::endl;
+    if(argc != 6) {
+        std::cout << "Usage is: " << argv[0] << " N M number_step seed nw" << std::endl;
         return(-1);
     }
 
@@ -21,22 +21,14 @@ int main(int argc, char * argv[]) {
     int numSteps = atoi(argv[3]);
     std::srand(atoi(argv[4]));
     int numWorkers = atoi(argv[5]);
-    int dynamic = atoi(argv[6]);
-    int chunksize;
-
-    if (dynamic != 0){
-        chunksize = N * M / numWorkers / 1000;
-    }
-    else{
-        chunksize = 0;
-    }
-
     short int cellStates = 2;
+    
+    int chunksize = N * M / numWorkers / 1000;
 
     GameOfLifeRule rule = GameOfLifeRule();
     Board board = Board(N, M, cellStates, rule);
-    ffSolver solver = ffSolver(&board);
-
+    ThreadPoolSolver solver = ThreadPoolSolver(&board);
+    
     std::vector<std::vector<short int>> firstState (N, std::vector<short int> (M));
     for (auto &row: firstState){
         std::generate(row.begin(), row.end(), binaryInit);

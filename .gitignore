@@ -3,3 +3,5 @@ build
 todo.txt
 .DS_Store
 .vscode	
+results_xeon
+results_mac

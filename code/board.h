@@ -1,9 +1,7 @@
 #ifndef BOARD_H
 #define BOARD_H
 
-#include"rules.h"
-#include <vector>
-
+#include "rules.h"
 
 class Board{
 
@@ -11,6 +9,8 @@ class Board{
         friend class Solver;
         friend class SequentialSolver;
         friend class ThreadSolver;
+        friend class ThreadPoolSolver;
+        friend class FunctionPool;
         friend class ffSolver;
 
         int N, M;
