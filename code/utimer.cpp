@@ -1,6 +1,6 @@
 #include <iostream>
 #include <chrono>
-
+#include <ctime>
 
 #define START(timename) auto timename = std::chrono::system_clock::now();
 #define STOP(timename,elapsed)  auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now() - timename).count();
@@ -27,10 +27,8 @@ public:
   }
 
   ~utimer() {
-    stop =
-      std::chrono::system_clock::now();
-    std::chrono::duration<double> elapsed =
-      stop - start;
+    stop = std::chrono::system_clock::now();
+    std::chrono::duration<double> elapsed = stop - start;
     auto musec =
       std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
     

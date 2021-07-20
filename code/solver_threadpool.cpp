@@ -1,72 +1,34 @@
 #include "solvers.h"
-#include <thread>
-#include <queue>
-#include <functional>
 #include <mutex>
+#include <thread>
 #include <condition_variable>
-#include <atomic>
-#include <cassert>
 #include <iostream>
-#include <math.h>
+#include <cmath>
+#include <queue>
 
-class ThreadPoolSolver::FunctionPool{
+class ThreadPoolSolver::Barrier {
     private:
-
-        std::queue<std::pair<int, int> > ranges_queue;
-        std::mutex *m_lock;
-        std::condition_variable *m_data_condition;
-        std::atomic<bool> *m_accept_functions;
-        Board *parentPtr;
-        
-        void update(std::pair<int, int> range){
-            for (int i = range.first; i < range.second; i++){
-                parentPtr->updateCell(i);
-            }
-        }
+        std::mutex m;
+        std::condition_variable cv;
+        int counter;
+        int waiting;
+        int thread_count;
+        std::function<void()> comp_f;
 
     public:
-        FunctionPool(Board *parent) : ranges_queue(), parentPtr(parent){
-            m_accept_functions = new std::atomic<bool> (true);
-            m_data_condition = new std::condition_variable();
-            m_lock = new std::mutex();
-        }
+        Barrier(int count, const std::function<void()>& on_completion) : thread_count(count), counter(0), waiting(0), comp_f(on_completion){}
 
-        void push(std::pair<int, int> range){
-            std::unique_lock<std::mutex> lock(*m_lock);
-            ranges_queue.push(range);
-            // when we send the notification immediately, the consumer will try to get the lock , so unlock asap
-            lock.unlock();
-            m_data_condition->notify_one();
-        }
-
-        void done(){
-            std::unique_lock<std::mutex> lock(*m_lock);
-            *m_accept_functions = false;
-            lock.unlock();
-            // when we send the notification immediately, the consumer will try to get the lock , so unlock asap
-            m_data_condition->notify_all();
-            //notify all waiting threads.
-        }
-
-
-        void infinite_loop_func(){
-            std::pair<int, int> range; 
-            while (true){
-                {
-                    std::unique_lock<std::mutex> lock(*m_lock);
-                    m_data_condition->wait(lock, [this]() {return !ranges_queue.empty() || !(*m_accept_functions); });
-                    if (!(*m_accept_functions) && ranges_queue.empty())
-                    {
-                        //lock will be release automatically.
-                        //finish the thread loop and let it join in the main thread.
-                        return;
-                    }
-                    range = ranges_queue.front();
-                    ranges_queue.pop();
-                    //release the lock
-                }
-                update(range);
-            }
+        void wait(){
+            std::unique_lock<std::mutex> lk(m);
+            ++counter;
+            ++waiting;
+            cv.wait(lk, [this]{return counter >= thread_count;});
+            if (waiting == thread_count)
+                comp_f();
+            --waiting;
+            cv.notify_one();
+            if(waiting == 0)
+                counter = 0;
         }
 };
 
@@ -75,49 +37,79 @@ ThreadPoolSolver::ThreadPoolSolver(Board *parent){
 }
 
 void ThreadPoolSolver::solve(int numSteps, bool verbose, int numWorkers, int chunksize){
-    utimer tp("thread_solver");
     
-    if(verbose){
-        parentPtr->printBoard();
-    }
-
-    int N = parentPtr->N;
-    int M = parentPtr->M;
-
-    for (int i = 0; i < numSteps; i++) {
-        
-        parentPtr->swapBoards();
-        
-        FunctionPool funcPool = FunctionPool(parentPtr);
-
-        std::vector<std::thread> threadPool;
-
-        int start = 0;
-
-        while (start < N * M){
-            int stop = start + chunksize;
-            if (stop > N * M){
-                stop = N * M;
-            }
-
-            std::pair<int,int> range = {start,stop};
-            funcPool.push(range);
-
-            start = stop;
-        }
-
-        funcPool.done();
-
-        for (int i = 0; i < numWorkers; i++){
-            threadPool.push_back(std::thread(&FunctionPool::infinite_loop_func, &funcPool));
-        }
-
-        for (unsigned int i = 0; i < threadPool.size(); i++){
-            threadPool.at(i).join();
-        }
-
+    {
+        utimer tp ("threadpool_solver");
+    
         if(verbose){
             parentPtr->printBoard();
         }
+        parentPtr->swapBoards();
+
+        int iter = 0;
+        int N = parentPtr->N;
+        int M = parentPtr->M;
+        int numRanges = std::ceil (N * M / chunksize);
+        std::mutex ranges_lock;
+        std::queue<std::pair<int,int>> ranges;
+
+        for (int i = 0; i < numRanges; i++){
+            int start = i * chunksize;
+            int stop = i + 1 == numRanges ? N * M : start + chunksize;
+            std::pair<int,int> range = {start,stop};
+            ranges.push(range);
+        }
+        
+
+        bool work = true;
+
+        auto on_completion = [&]() noexcept {
+            if(verbose){
+                parentPtr->printBoard();
+            }
+            iter++;
+            if (iter == numSteps){
+                work = false;
+            }
+            else{
+                for (int i = 0; i < numRanges; i++){
+                    int start = i * chunksize;
+                    int stop = i + 1 == numRanges ? N * M : start + chunksize;
+                    std::pair<int,int> range = {start,stop};
+                    ranges.push(range);
+                }
+                parentPtr->swapBoards();
+            }
+        };
+
+        Barrier barrier(numWorkers, on_completion);
+
+        auto work_wrapper = [&](){
+            while (work){
+                while (true){
+                    std::unique_lock<std::mutex> lock(ranges_lock);
+                    if (ranges.empty()){
+                        break;
+                    }
+                    std::pair<int,int> range = ranges.front();
+                    ranges.pop();
+                    lock.unlock();
+                    for (int i = range.first; i < range.second; i++){
+                        parentPtr->updateCell(i);
+                    }
+                }
+                barrier.wait();
+            }
+        };
+
+        std::vector<std::thread> workers;
+
+        for (int tid = 0; tid < numWorkers; tid++)
+            workers.push_back(std::thread(work_wrapper));
+
+        for (std::thread& t : workers){
+            t.join();
+        }
     }
+
 }

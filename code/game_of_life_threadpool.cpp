@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <cstdlib>
 #include <iostream>
+#include <cmath>
 
 bool verbose = false;
 
@@ -23,7 +24,7 @@ int main(int argc, char * argv[]) {
     int numWorkers = atoi(argv[5]);
     short int cellStates = 2;
     
-    int chunksize = N * M / numWorkers / 1000;
+    int chunksize = int(std::ceil(float(N * M) / float(numWorkers) / 1000.0));
 
     GameOfLifeRule rule = GameOfLifeRule();
     Board board = Board(N, M, cellStates, rule);
@@ -37,6 +38,6 @@ int main(int argc, char * argv[]) {
     board.defineInitialState(firstState);
     board.reset();
     solver.solve(numSteps, verbose, numWorkers, chunksize);
-    
+
     return(0);
 }

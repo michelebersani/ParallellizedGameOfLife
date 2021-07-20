@@ -35,7 +35,7 @@ class ThreadPoolSolver : public Solver{
         ThreadPoolSolver(Board * parent);
         void solve(int numSteps, bool verbose, int numWorkers, int chunksize);
     private:
-        class FunctionPool;
+        class Barrier;
 };
 
 #endif

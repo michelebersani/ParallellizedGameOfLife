@@ -1,10 +1,5 @@
-CMAKE
+describe assumption of linear ideal speedup
 
-1) Source build folder
-cd build
+describe dynamic parallelism
 
-2) compile:
-cmake ..
-
-3) build:
-cmake --build . 
+chunksize choice
