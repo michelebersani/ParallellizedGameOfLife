@@ -1,5 +1,0 @@
-describe assumption of linear ideal speedup
-
-describe dynamic parallelism
-
-chunksize choice
