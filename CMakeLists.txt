@@ -10,9 +10,14 @@ add_library(
     ../code/solver_seq.cpp
     )
 add_library(
-    ff_solver
+    ff_farm_solver
     ../code/solvers.h
-    ../code/solver_ff.cpp
+    ../code/solver_ff_farm.cpp
+)
+add_library(
+    ff_parfor_solver
+    ../code/solvers.h
+    ../code/solver_ff_parfor.cpp
 )
 add_library(
     thread_solver
@@ -22,7 +27,7 @@ add_library(
 add_library(
     thread_pool_solver
     ../code/solvers.h
-    ../code/solver_threadpool.cpp
+    ../code/solver_dyn_thread.cpp
 )
 add_library(
     board
@@ -39,10 +44,10 @@ add_executable(seq ../code/game_of_life_seq.cpp)
 target_link_libraries(seq PRIVATE seq_solver rules board)
 
 add_executable(ff ../code/game_of_life_ff.cpp)
-target_link_libraries(ff PRIVATE ff_solver rules board)
+target_link_libraries(ff PRIVATE ff_parfor_solver ff_farm_solver rules board)
 
 add_executable(thread ../code/game_of_life_thread.cpp)
 target_link_libraries(thread PRIVATE thread_solver rules board)
 
-add_executable(threadpool ../code/game_of_life_threadpool.cpp)
-target_link_libraries(threadpool PRIVATE thread_pool_solver rules board)
+add_executable(dyn_thread ../code/game_of_life_dyn_thread.cpp)
+target_link_libraries(dyn_thread PRIVATE thread_pool_solver rules board)

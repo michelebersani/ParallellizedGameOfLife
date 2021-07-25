@@ -22,29 +22,25 @@ int main(int argc, char * argv[]) {
     std::srand(atoi(argv[4]));
     int numWorkers = atoi(argv[5]);
     int dynamic = atoi(argv[6]);
-    int chunksize;
-
-    if (dynamic != 0){
-        chunksize = N * M / numWorkers / 1000;
-    }
-    else{
-        chunksize = 0;
-    }
 
     short int cellStates = 2;
 
     GameOfLifeRule rule = GameOfLifeRule();
     Board board = Board(N, M, cellStates, rule);
-    ffSolver solver = ffSolver(&board);
-
     std::vector<std::vector<short int>> firstState (N, std::vector<short int> (M));
     for (auto &row: firstState){
         std::generate(row.begin(), row.end(), binaryInit);
     }
-
     board.defineInitialState(firstState);
     board.reset();
-    solver.solve(numSteps, verbose, numWorkers, chunksize);
-    
+
+    if(dynamic){
+        ffFarmSolver solver = ffFarmSolver(&board);
+        solver.solve(numSteps, verbose, numWorkers);
+    }
+    else{
+        ffParforSolver solver = ffParforSolver(&board);
+        solver.solve(numSteps, verbose, numWorkers);
+    }
     return(0);
 }

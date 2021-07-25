@@ -92,5 +92,6 @@
         "typeindex": "cpp",
         "variant": "cpp",
         "cfenv": "cpp"
-    }
+    },
+    "jupyter.jupyterServerType": "local"
 }

@@ -34,7 +34,7 @@ int main(int argc, char * argv[]) {
 
     board.defineInitialState(firstState);
     board.reset();
-    solver.solve(numSteps, verbose, numWorkers,1);
+    solver.solve(numSteps, verbose, numWorkers);
     
     return(0);
 }

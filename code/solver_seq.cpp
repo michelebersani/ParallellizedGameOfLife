@@ -4,7 +4,7 @@ SequentialSolver::SequentialSolver(Board *parent){
     this->parentPtr = parent;
 }
 
-void SequentialSolver::solve(int numSteps, bool verbose, int numWorkers, int chunksize){
+void SequentialSolver::solve(int numSteps, bool verbose, int numWorkers){
     utimer tp("seq_solver");
     if(verbose){
         parentPtr->printBoard();

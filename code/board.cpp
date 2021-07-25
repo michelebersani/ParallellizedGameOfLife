@@ -42,23 +42,14 @@ void Board::updateCell(int j){
     int upIndex = (row == 0) ? (N - 1) * M + col : (row - 1) * M + col;
     int downIndex = (row == N - 1) ? col : (row + 1) * M + col;
     int leftIndex = (col == 0) ? (row + 1) * M - 1 : row * M  + col - 1;
-    int rightIndex = (col == M - 1) ? row *M : row * M + col + 1;
-    int upLeftIndex = upIndex - col + leftIndex % M; 
-    int upRightIndex= upIndex - col + rightIndex % M; 
-    int downLeftIndex = downIndex - col + leftIndex % M;
-    int downRightIndex = downIndex - col + rightIndex % M;
+    int rightIndex = (col == M - 1) ? row * M : row * M + col + 1;
     
-    short int centre = pastBoard[j];
-    short int up = pastBoard[upIndex];
-    short int down = pastBoard[downIndex];
-    short int left = pastBoard[leftIndex];
-    short int right = pastBoard[rightIndex];
-    short int upLeft = pastBoard[upLeftIndex];
-    short int upRight = pastBoard[upRightIndex];
-    short int downLeft = pastBoard[downLeftIndex];
-    short int downRight = pastBoard[downRightIndex]; 
-    
-    presentBoard[j] = rule(centre, up, down, left, right, upLeft, upRight, downLeft, downRight);
+    presentBoard[j] = rule(
+            pastBoard[j], pastBoard[upIndex], pastBoard[downIndex],
+            pastBoard[leftIndex], pastBoard[rightIndex],
+            pastBoard[upIndex - col + leftIndex % M], pastBoard[upIndex - col + rightIndex % M],
+            pastBoard[downIndex - col + leftIndex % M], pastBoard[downIndex - col + rightIndex % M]
+        );
 
 }
 

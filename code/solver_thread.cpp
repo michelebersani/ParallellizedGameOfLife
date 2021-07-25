@@ -5,7 +5,7 @@ ThreadSolver::ThreadSolver(Board *parent){
     this->parentPtr = parent;
 }
 
-void ThreadSolver::solve(int numSteps, bool verbose, int numWorkers, int chunksize){
+void ThreadSolver::solve(int numSteps, bool verbose, int numWorkers){
     utimer tp("thread_solver");
     if(verbose){
         parentPtr->printBoard();
@@ -22,7 +22,7 @@ void ThreadSolver::solve(int numSteps, bool verbose, int numWorkers, int chunksi
         ranges[i].second   = i != (numWorkers - 1) ? (i + 1) * delta : N * M; 
     }
 
-    auto threadProcess = [&](std::pair<int,int> r, Board * parentPtr){
+    auto threadProcess = [&](std::pair<int,int> r, Board * parentPtr) noexcept {
         for(int i = r.first; i < r.second; i++)
             parentPtr->updateCell(i);
         };
@@ -32,11 +32,11 @@ void ThreadSolver::solve(int numSteps, bool verbose, int numWorkers, int chunksi
         parentPtr->swapBoards();
         
         std::vector<std::thread> tids;
-        for(int i = 0; i < numWorkers; i++) {                     // assign chuncks to threads
+        for(int i = 0; i < numWorkers; i++) {    // assign chuncks to threads
             tids.push_back(std::thread(threadProcess, ranges[i], parentPtr));
         }
         
-        for(std::thread& t: tids) {                        // await thread termination
+        for(std::thread& t: tids) {              // await thread termination
             t.join();
         }
 

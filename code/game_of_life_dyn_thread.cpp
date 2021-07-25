@@ -24,8 +24,6 @@ int main(int argc, char * argv[]) {
     int numWorkers = atoi(argv[5]);
     short int cellStates = 2;
     
-    int chunksize = int(std::ceil(float(N * M) / float(numWorkers) / 1000.0));
-
     GameOfLifeRule rule = GameOfLifeRule();
     Board board = Board(N, M, cellStates, rule);
     ThreadPoolSolver solver = ThreadPoolSolver(&board);
@@ -37,7 +35,7 @@ int main(int argc, char * argv[]) {
 
     board.defineInitialState(firstState);
     board.reset();
-    solver.solve(numSteps, verbose, numWorkers, chunksize);
-
+    solver.solve(numSteps, verbose, numWorkers);
+    
     return(0);
 }

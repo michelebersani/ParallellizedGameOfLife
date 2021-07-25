@@ -11,7 +11,10 @@ class Board{
         friend class ThreadSolver;
         friend class ThreadPoolSolver;
         friend class FunctionPool;
-        friend class ffSolver;
+        friend class ffFarmSolver;
+        friend class ffParforSolver;
+        friend struct Emitter;
+        friend struct Worker;
 
         int N, M;
         short int cellStates;

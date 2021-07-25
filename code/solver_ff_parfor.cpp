@@ -4,14 +4,14 @@
 
 using namespace ff;
 
-ffSolver::ffSolver(Board *parent){
+ffParforSolver::ffParforSolver(Board *parent){
     this->parentPtr = parent;
 }
 
-void ffSolver::solve(int numSteps, bool verbose, int numWorkers, int chunksize){
+void ffParforSolver::solve(int numSteps, bool verbose, int numWorkers){
     utimer tp("ff_solver");
     int size = parentPtr->N * parentPtr->M;
-    
+
     ParallelFor pf(numWorkers);
 
     if(verbose){
@@ -22,7 +22,7 @@ void ffSolver::solve(int numSteps, bool verbose, int numWorkers, int chunksize){
         
         parentPtr->swapBoards();
 
-        pf.parallel_for(0, size, 1, chunksize, [this](const int j) {
+        pf.parallel_for(0, size, 1, 0, [this](const int j) {
                 this->parentPtr->updateCell(j);
             }, numWorkers);
         
